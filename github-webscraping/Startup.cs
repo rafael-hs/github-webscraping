@@ -1,17 +1,13 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
+using github_webscraping.Business;
+using github_webscraping.Business.Implementations;
+using github_webscraping.Repository;
+using github_webscraping.Repository.Implementations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
 namespace github_webscraping
@@ -50,11 +46,11 @@ namespace github_webscraping
                     }
 
                 });
-
-                //var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                //c.IncludeXmlComments(xmlPath);
             });
+
+            //Dependency Injection
+            services.AddScoped<IGitHubRepoBusiness, GitHubRepoBusinessImpl>();
+            services.AddScoped<IGitHubRepoRepository, GitHubRepoRepositoryImpl>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
