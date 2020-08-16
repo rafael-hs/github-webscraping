@@ -8,8 +8,15 @@ namespace github_webscraping.Shared
 {
     public static class Constants
     {
-
-        public static string REPO_SECTION { get => "js-details-container"; }
-        public static string GIT_URL_BASE { get => "https://github.com"; }
+        //string for use unique one instance in scope
+        public const string RepositoryLinkClassInit = "js-navigation-open";
+        public const string RepositoryLinkClassEnd = "link-gray-dark"; 
+        public const string GitUrlBase = "https://github.com";
+        public const string ClassPathFile = "final-path";
+        public const string ClassInfoArchiveOne = "text-mono";
+        public const string ClassInfoArchiveTwo = "f6";
+        public const string ClassInfoArchiveThree = "flex-auto";
+        public const string ClassInfoArchiveFour = "pr-3";
+        public const string ClassInfoArchiveFive = "flex-order-2";
     }
 }

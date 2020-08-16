@@ -50,7 +50,7 @@ namespace github_webscraping
 
             //Dependency Injection
             services.AddScoped<IGitHubRepoBusiness, GitHubRepoBusinessImpl>();
-            services.AddScoped<IGitHubRepoRepository, GitHubRepoRepositoryImpl>();
+            services.AddScoped<IGitHubMappingRepository, GitHubMappingRepositoryImpl>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -62,7 +62,7 @@ namespace github_webscraping
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebScraping Github Api");
             });
 
             app.UseHttpsRedirection();

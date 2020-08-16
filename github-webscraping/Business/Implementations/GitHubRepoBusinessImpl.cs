@@ -1,21 +1,43 @@
 ﻿using github_webscraping.Models;
 using github_webscraping.Repository;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace github_webscraping.Business.Implementations
 {
     public class GitHubRepoBusinessImpl : IGitHubRepoBusiness
     {
-        private IGitHubRepoRepository _gitHubRepoRepository;
+        private IGitHubMappingRepository _gitHubMappingRepository;
 
-       public GitHubRepoBusinessImpl(IGitHubRepoRepository gitHubRepoRepository)
+        public GitHubRepoBusinessImpl(
+            IGitHubMappingRepository gitHubRepoRepository)
         {
-            _gitHubRepoRepository = gitHubRepoRepository;
+            _gitHubMappingRepository = gitHubRepoRepository;
         }
 
-        public GitHubBaseRepo RepositoryMapping(string baseUrl)
+        public dynamic RepositoryMapping(string baseUrl)
         {
-            var result = _gitHubRepoRepository.RepositoryMapping(baseUrl);
-            return result;
+            var files = _gitHubMappingRepository.RepositoryMapping(baseUrl).GitHubFiles;
+            var Grouped = MapData(files);
+            
+            return Grouped;
+        }
+
+        private IList<(string extension, int lines, float bytes, IGrouping<string, GitHubFile> files)> MapData(IList<GitHubFile> gitHubFiles)
+        {
+            var filesGrouped = gitHubFiles.GroupBy(f => f.Extension);
+            var Grouped = new List<(string extension, int lines, float bytes, IGrouping<string, GitHubFile> files)>();
+
+            foreach (var fileGrouped in filesGrouped)
+            {
+                int lines = 0;
+                float bytes = 0;
+                fileGrouped.ToList().ForEach(f => lines += f.FileLines);
+                fileGrouped.ToList().ForEach(f => bytes += f.FileBytes);
+                Grouped.Add((extension: fileGrouped.Key, lines, bytes, files: fileGrouped));
+            }
+
+            return Grouped;
         }
     }
 }

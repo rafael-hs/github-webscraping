@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace github_webscraping.Models
 {
@@ -9,11 +6,12 @@ namespace github_webscraping.Models
     {
         public DataReturnRepository()
         {
-
+            this.GitHubFiles = new List<GitHubFile>();
         }
 
-        public string Extention { get; set; }
-        public int TotalLines { get; set; }
-        public float TotalBytes { get; set; }
+        public IList<GitHubFile> GitHubFiles { get; protected set; }
+
+        public void AddFile(GitHubFile gitHubFile) => GitHubFiles.Add(gitHubFile);
+
     }
 }

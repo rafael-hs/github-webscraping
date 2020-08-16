@@ -2,11 +2,11 @@
 using github_webscraping.Business;
 using github_webscraping.Shared;
 using Microsoft.AspNetCore.Mvc;
-
+using Newtonsoft.Json;
 
 namespace github_webscraping.Controllers
 {
-    //[ApiVersion("1")]
+    [ApiVersion("1")]
     [Route("api/[controller]/v{version:apiVersion}")]
     [ApiController]
     public class PaserController : ControllerBase
@@ -31,32 +31,7 @@ namespace github_webscraping.Controllers
                 return BadRequest(ReturnApi.Empty);
 
             var response = await Task.FromResult(_gitHubRepoBusiness.RepositoryMapping(baseUrl));
-            return Ok(response);
+            return Ok(JsonConvert.SerializeObject(response));
         }
-
-        //// GET api/<PaserController>/5
-        //[HttpGet("{id}")]
-        //public string Get(int id)
-        //{
-        //    return "value";
-        //}
-
-        //// POST api/<PaserController>
-        //[HttpPost]
-        //public void Post([FromBody] string value)
-        //{
-        //}
-
-        //// PUT api/<PaserController>/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
-
-        //// DELETE api/<PaserController>/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
     }
 }
