@@ -1,6 +1,6 @@
 ### Hi guys, my name is Rafael
 
-##### I build api in dotnet core and docker
+##### I builded api in dotnet core and docker
 
 I was focusing a lot on performance but it was still a little slow because of the lib I used to manipulate the html, in the end result it ended up bottlenecking the request.
 
