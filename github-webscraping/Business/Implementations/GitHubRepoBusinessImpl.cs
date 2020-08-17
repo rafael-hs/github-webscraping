@@ -15,11 +15,10 @@ namespace github_webscraping.Business.Implementations
             _gitHubMappingRepository = gitHubRepoRepository;
         }
 
-        public dynamic RepositoryMapping(string baseUrl)
+        public IList<(string extension, int lines, float bytes, IGrouping<string, GitHubFile> files)> RepositoryMapping(string baseUrl)
         {
-            var files = _gitHubMappingRepository.RepositoryMapping(baseUrl).GitHubFiles;
+            var files =  _gitHubMappingRepository.RepositoryMapping(baseUrl);
             var Grouped = MapData(files);
-            
             return Grouped;
         }
 

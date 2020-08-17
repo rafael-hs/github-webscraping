@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>github-webscraping</name>
+    </assembly>
+    <members>
+        <member name="M:github_webscraping.Controllers.PaserController.PaserUrl(System.String)">
+            <summary>
+            Return all files on github repository
+            </summary>
+            <remarks>
+            Return all files on github repository, grouped by extension with total number lines and size.
+            </remarks>
+            <param name="baseUrl">The Url for searching</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

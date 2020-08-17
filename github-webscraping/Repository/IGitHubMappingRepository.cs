@@ -1,9 +1,11 @@
 ﻿using github_webscraping.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace github_webscraping.Repository
 {
     public interface IGitHubMappingRepository
     {
-        DataReturnRepository RepositoryMapping(string baseUrl);
+        IList<GitHubFile> RepositoryMapping(string baseUrl);
     }
 }

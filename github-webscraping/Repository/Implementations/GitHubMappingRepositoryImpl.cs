@@ -4,7 +4,9 @@ using HtmlAgilityPack;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace github_webscraping.Repository.Implementations
 {
@@ -13,20 +15,22 @@ namespace github_webscraping.Repository.Implementations
 
         public GitHubMappingRepositoryImpl()
         {
-            this.DataReturnRepository = new DataReturnRepository();
+            this.doc = new HtmlDocument();
+            this.gitHubFiles = new List<GitHubFile>();
             this.web = new HtmlWeb();
         }
 
-        public DataReturnRepository DataReturnRepository;
-        public HtmlWeb web;
         public IList<string> pastesUrls;
+        public HtmlDocument doc;
+        public IList<GitHubFile> gitHubFiles;
+        public HtmlWeb web;
 
-        public DataReturnRepository RepositoryMapping(string baseUrl)
+        public IList<GitHubFile> RepositoryMapping(string baseUrl)
         {
-            var htmlDoc = web.Load(baseUrl);
+            var doc = web.Load(baseUrl);
             pastesUrls = new List<string>();
 
-            var linkRepoOrFile = htmlDoc.DocumentNode.Descendants(0)
+            var linkRepoOrFile = doc.DocumentNode.Descendants(0)
                 .Where(n =>
                        n.HasClass($"{Constants.RepositoryLinkClassInit}") &&
                        n.HasClass($"{Constants.RepositoryLinkClassEnd}"));
@@ -39,11 +43,9 @@ namespace github_webscraping.Repository.Implementations
                 }
                 else
                 {
-                    var url = $"{Constants.GitUrlBase}{node.Attributes["href"].Value}";
-                    DataReturnRepository.AddFile(FarmFile(url));
+                    gitHubFiles.Add(FarmFile($"{Constants.GitUrlBase}{node.Attributes["href"].Value}"));
                 }
             }
-
             if (pastesUrls.Count > 0)
             {
                 foreach (var paste in pastesUrls)
@@ -51,27 +53,40 @@ namespace github_webscraping.Repository.Implementations
                     RepositoryMapping(paste);
                 }
             }
-
-            return DataReturnRepository;
+            return gitHubFiles;
         }
 
-        private GitHubFile FarmFile(string url)
+        public GitHubFile FarmFile(string url)
         {
-            var fileDoc = web.Load(url).DocumentNode;
-            var archiveName = fileDoc.Descendants(0).Where(n => n.HasClass($"{Constants.ClassPathFile}")).First().InnerText;
+            var html = LoadStringUrl(url);
+            doc.LoadHtml(html);
+            var archiveName = doc.DocumentNode.Descendants(0).Where(n => n.HasClass($"{Constants.ClassPathFile}")).First().InnerText;
             var extension = Path.GetExtension(archiveName);
-            var linesAndBytes = fileDoc.Descendants(0)
-                .Where(n => n.HasClass($"{Constants.ClassInfoArchiveOne}") &&
-                       n.HasClass($"{Constants.ClassInfoArchiveTwo}") &&
-                       n.HasClass($"{Constants.ClassInfoArchiveThree}") &&
-                       n.HasClass($"{Constants.ClassInfoArchiveFour}") &&
-                       n.HasClass($"{Constants.ClassInfoArchiveFive}"))
+            var linesAndBytes = doc.DocumentNode.Descendants(0)
+                .Where(n => n.HasClass($"{Constants.ClassInfoArchiveOne}") && n.HasClass($"{Constants.ClassInfoArchiveTwo}"))
                 .First().InnerText;
 
             var lines = ReturnNumberLines(Regex.Match(linesAndBytes, @"(\d+) lines").Value);
             var size = ReturnSizeFileInBytes(linesAndBytes);
 
             return new GitHubFile(url, archiveName, extension, size, lines);
+        }
+
+        private string LoadStringUrl(string url)
+        {
+            string siteContent = string.Empty;
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.AutomaticDecompression = DecompressionMethods.GZip;
+
+            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+            using (Stream responseStream = response.GetResponseStream())         
+            using (StreamReader streamReader = new StreamReader(responseStream))
+            {
+                siteContent = streamReader.ReadToEnd();
+            }
+
+            return siteContent;
         }
 
         private int ReturnNumberLines(string linesInput)
@@ -88,15 +103,15 @@ namespace github_webscraping.Repository.Implementations
             float bytesFloat = 0;
             if (bytes.Contains("KB"))
             {
-                bytes = Regex.Match(bytes, @"(\d+) KB").Value;
-                bytes = Regex.Match(bytes, @"(\d+)").Value;
+                bytes = Regex.Match(bytes, @"(\d+)?.?(\d+) KB").Value;
+                bytes = Regex.Match(bytes, @"(\d+)?.?(\d+)").Value;
                 bytesFloat = float.Parse(bytes) * 1000;
 
             }
             else if (bytes.Contains("MB"))
             {
-                bytes = Regex.Match(bytes, @"(\d+) MB").Value;
-                bytes = Regex.Match(bytes, @"(\d+)").Value;
+                bytes = Regex.Match(bytes, @"(\d+).(\d+) MB").Value;
+                bytes = Regex.Match(bytes, @"(\d+).(\d+)").Value;
                 bytesFloat = float.Parse(bytes) * 1000000;
             }
             else
