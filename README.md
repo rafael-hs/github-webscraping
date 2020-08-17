@@ -12,7 +12,7 @@ anyway this challenge was very cool
 heroku link -> https://github-webscraping.herokuapp.com/swagger/index.html
 
 Ex:
-![Requisition ex](imgs/redex)
+![Requisition ex](imgs/redex.png)
 
 Output:
-![output ex](imgs/out)
+![output ex](imgs/out.png)
